@@ -1,0 +1,23 @@
+extends: default
+
+rules:
+
+  line-length:
+    max: 120
+
+  document-start:
+    present: false
+
+  truthy:
+    allowed-values:
+      - "true"
+      - "false"
+
+  comments:
+    min-spaces-from-content: 1
+
+  indentation:
+    spaces: 2
+
+ignore: |
+  charts/**
