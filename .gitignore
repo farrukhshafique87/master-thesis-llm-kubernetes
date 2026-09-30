@@ -51,3 +51,6 @@ build/
 
 # Experiment Output
 results/*.tmp
+
+# Keep example environment files in Git
+!.env.example
