@@ -2,12 +2,12 @@ from fastapi import FastAPI
 from fastapi.responses import Response
 from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 
-from app.api.chat import router as chat_router
-from app.api.health import router as health_router
+from app.api.chat_routes import router as chat_router
+from app.api.health_routes import router as health_router
 from app.core.config import settings
-from app.middleware.logging import RequestLoggingMiddleware
-from app.middleware.metrics import metrics_middleware
+from app.middleware.metrics_middleware import metrics_middleware
 from app.middleware.request_id import RequestIDMiddleware
+from app.middleware.request_logging import RequestLoggingMiddleware
 
 app = FastAPI(
     title=settings.APP_NAME,

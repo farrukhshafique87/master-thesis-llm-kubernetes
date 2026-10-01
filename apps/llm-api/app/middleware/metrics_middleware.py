@@ -2,7 +2,7 @@ import time
 
 from fastapi import Request
 
-from app.core.metrics import REQUEST_COUNTER, REQUEST_LATENCY
+from app.core.metrics_definitions import REQUEST_COUNTER, REQUEST_LATENCY
 
 
 async def metrics_middleware(request: Request, call_next):
