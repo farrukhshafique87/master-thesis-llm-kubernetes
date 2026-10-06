@@ -4,3 +4,6 @@ __pycache__/
 .git
 venv
 .env
+tests
+requirements-dev.txt
+.ruff_cache
