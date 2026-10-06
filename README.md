@@ -25,7 +25,7 @@ The application is based on a small distributed LLM serving stack consisting of:
 
 * **FastAPI** — API layer for handling inference requests
 * **Ollama** — local LLM inference server
-* **Llama 3.2:3b** — primary LLM used for the prototype
+* **qwen2.5:0.5b** — primary LLM used for the prototype
 * **Kubernetes** — container orchestration and distributed deployment
 * **Prometheus** — metrics collection
 * **Grafana** — monitoring and visualization

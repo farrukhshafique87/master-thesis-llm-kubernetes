@@ -9,8 +9,10 @@ namespace: llm-secure
 resources:
   - ../../base
 
-# components:            # added in Milestone 6
-#   - ../../components/rbac
-#   - ../../components/network-policies
-#   - ../../components/secrets
-#   - ../../components/ingress-gateway
+components:
+  - ../../components/kind-placement
+  # Milestone 6: add one line per control, e.g.
+  # - ../../components/rbac
+  # - ../../components/network-policies
+  # - ../../components/secrets
+  # - ../../components/ingress-gateway

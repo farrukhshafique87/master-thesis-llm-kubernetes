@@ -1,0 +1,23 @@
+# Kind-only: place Ollama and FastAPI on fixed nodes so baseline and secure
+# runs use the same hardware path (placement is a controlled variable).
+# Labels are set once by scripts/kind-up.sh (role=inference / role=api).
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+
+patches:
+  - target:
+      kind: Deployment
+      name: ollama
+    patch: |-
+      - op: add
+        path: /spec/template/spec/nodeSelector
+        value:
+          role: inference
+  - target:
+      kind: Deployment
+      name: fastapi
+    patch: |-
+      - op: add
+        path: /spec/template/spec/nodeSelector
+        value:
+          role: api

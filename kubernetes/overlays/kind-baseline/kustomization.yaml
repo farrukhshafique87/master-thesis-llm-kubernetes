@@ -8,6 +8,9 @@ namespace: llm-baseline
 resources:
   - ../../base
 
+components:
+  - ../../components/kind-placement
+
 # Kind-only entry point for the host-side load generator (k6):
 # localhost:8010 -> Kind node :30010 -> fastapi-service. No port-forward
 # (kubectl port-forward is not suitable for load testing).

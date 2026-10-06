@@ -28,9 +28,7 @@ spec:
 
         - name: ollama
 
-          # TODO(pin): replace "latest" with the exact version in use, e.g.
-          #   kubectl exec deploy/ollama -n <ns> -- ollama --version
-          image: ollama/ollama:latest
+          image: ollama/ollama@sha256:292ee7945dfc3d5840a181f3ab86fedb1e66703e02c8af98b50f4da56b7e278c  # version 0.35.1
 
           imagePullPolicy: IfNotPresent
 
