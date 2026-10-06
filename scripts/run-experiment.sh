@@ -45,12 +45,27 @@ k6 run --quiet -e BASE_URL="$BASE_URL" tests/k6/smoke.js
 echo "== warm-up ($WARMUP, discarded)"
 k6 run --quiet -e BASE_URL="$BASE_URL" -e VUS="$VUS" -e DURATION="$WARMUP" "$SCRIPT" >/dev/null || true
 
+# Resource sampling (CPU/memory per pod) every 15 s if Metrics Server is installed
+SAMPLER_PID=""
+if kubectl top pods -n "$NS" >/dev/null 2>&1; then
+  (
+    while true; do
+      echo "$(date -u +%H:%M:%S) $(kubectl top pods -n "$NS" --no-headers 2>/dev/null | tr -s ' ' | tr '\n' ';')"
+      sleep 15
+    done
+  ) > "$OUT/${CONFIG}-r${REP}.resources.txt" &
+  SAMPLER_PID=$!
+else
+  echo "NOTE: Metrics Server not available - no CPU/memory samples for this run"
+fi
+
 BEFORE="$(restarts)"
 echo "== measured run: $RUN_ID ($DURATION, $VUS VUs)"
 START="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 k6 run -e BASE_URL="$BASE_URL" -e VUS="$VUS" -e DURATION="$DURATION" -e RUN_ID="$RUN_ID" \
   --summary-export="$OUT/${CONFIG}-r${REP}.json" "$SCRIPT" || true
 END="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+[ -n "$SAMPLER_PID" ] && kill "$SAMPLER_PID" 2>/dev/null || true
 AFTER="$(restarts)"
 
 {

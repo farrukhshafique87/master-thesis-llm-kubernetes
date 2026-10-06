@@ -67,7 +67,7 @@ Workload intensity (EXP-02), replica count (EXP-03) and resource limits (EXP-04)
 | RQ  | Exp    | Role            | Variable              | Metrics     | Status      |
 | --- | ------ | --------------- | --------------------- | ----------- | ----------- |
 | RQ1 | EXP-00 | Prerequisite    | Deployment health     | A           | Partial     |
-| RQ1 | EXP-01 | Reference       | 1 VU, unsecured       | L T E C M S | In progress |
+| RQ1 | EXP-01 | Reference       | 1 VU, unsecured       | L T E C M S | Completed   |
 | RQ1 | EXP-02 | Operating point | VUs / request rate    | L T E C M   | Planned     |
 | RQ1 | EXP-03 | Sensitivity     | Replica count         | L T E C M   | Planned     |
 | RQ1 | EXP-04 | Sensitivity     | CPU / memory limits   | L T E C M   | Planned     |

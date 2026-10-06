@@ -1,0 +1,8 @@
+18:24:22 fastapi-84779dbf55-dkxx8 89m 49Mi ;ollama-54c996fff8-qrjgh 1m 646Mi ;
+18:24:37 fastapi-84779dbf55-dkxx8 89m 49Mi ;ollama-54c996fff8-qrjgh 1m 646Mi ;
+18:24:52 fastapi-84779dbf55-dkxx8 86m 48Mi ;ollama-54c996fff8-qrjgh 1m 646Mi ;
+18:25:07 fastapi-84779dbf55-dkxx8 85m 49Mi ;ollama-54c996fff8-qrjgh 1m 646Mi ;
+18:25:22 fastapi-84779dbf55-dkxx8 84m 48Mi ;ollama-54c996fff8-qrjgh 1m 646Mi ;
+18:25:37 fastapi-84779dbf55-dkxx8 83m 49Mi ;ollama-54c996fff8-qrjgh 1m 646Mi ;
+18:25:52 fastapi-84779dbf55-dkxx8 81m 49Mi ;ollama-54c996fff8-qrjgh 1m 646Mi ;
+18:26:07 fastapi-84779dbf55-dkxx8 85m 48Mi ;ollama-54c996fff8-qrjgh 1m 646Mi ;
