@@ -54,3 +54,13 @@ results/*.tmp
 
 # Keep example environment files in Git
 !.env.example
+
+# Secrets / keys / certificates (never commit)
+certs/
+*.key
+*.pem
+*.p12
+kubeconfig*
+monitoring/grafana/secret.yaml
+!monitoring/grafana/secret.example.yaml
+!docker/.env.example
