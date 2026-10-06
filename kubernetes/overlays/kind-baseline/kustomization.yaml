@@ -1,0 +1,24 @@
+# Environment: Kind (local)   Security level: BASELINE (no security controls)
+# Reference configuration for RQ1-RQ3. Same base is reused by every overlay.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: llm-baseline
+
+resources:
+  - ../../base
+
+# Kind-only entry point for the host-side load generator (k6):
+# localhost:8010 -> Kind node :30010 -> fastapi-service. No port-forward
+# (kubectl port-forward is not suitable for load testing).
+patches:
+  - target:
+      kind: Service
+      name: fastapi-service
+    patch: |-
+      - op: replace
+        path: /spec/type
+        value: NodePort
+      - op: add
+        path: /spec/ports/0/nodePort
+        value: 30010

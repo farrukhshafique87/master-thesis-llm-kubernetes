@@ -5,7 +5,6 @@ namespace: llm
 
 resources:
   - namespace.yaml
-  - storage/persistent-volume.yaml
   - storage/persistent-volume-claim.yaml
   - deployments/ollama-deployment.yaml
   - services/ollama-service.yaml

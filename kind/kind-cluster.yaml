@@ -1,0 +1,33 @@
+# Kind cluster for the thesis: 1 control-plane + 2 workers.
+# Default CNI is disabled on purpose: Calico is installed instead (kindnet does
+# NOT enforce NetworkPolicies). The SAME CNI is used for baseline and secure
+# runs so the CNI is not a confounding variable.
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: thesis-cluster
+networking:
+  disableDefaultCNI: true
+  podSubnet: "192.168.0.0/16"
+nodes:
+  - role: control-plane
+    image: kindest/node:v1.31.0
+    kubeadmConfigPatches:
+      - |
+        kind: InitConfiguration
+        nodeRegistration:
+          kubeletExtraArgs:
+            node-labels: "ingress-ready=true"
+    extraPortMappings:
+      - containerPort: 30010   # baseline: FastAPI NodePort  -> localhost:8010
+        hostPort: 8010
+        protocol: TCP
+      - containerPort: 80      # secure: NGINX Ingress HTTP  -> localhost:8080
+        hostPort: 8080
+        protocol: TCP
+      - containerPort: 443     # secure: NGINX Ingress HTTPS -> localhost:8443
+        hostPort: 8443
+        protocol: TCP
+  - role: worker
+    image: kindest/node:v1.31.0
+  - role: worker
+    image: kindest/node:v1.31.0

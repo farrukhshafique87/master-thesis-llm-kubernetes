@@ -1,0 +1,16 @@
+# Environment: Kind (local)   Security level: SECURE
+# Milestones 4/6 add the security controls here (one component per control so
+# each can be enabled alone for RQ3, or all together for RQ1).
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: llm-secure
+
+resources:
+  - ../../base
+
+# components:            # added in Milestone 6
+#   - ../../components/rbac
+#   - ../../components/network-policies
+#   - ../../components/secrets
+#   - ../../components/ingress-gateway

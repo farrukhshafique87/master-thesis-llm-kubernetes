@@ -9,7 +9,8 @@ spec:
   accessModes:
     - ReadWriteOnce
 
-  storageClassName: manual
+  # No storageClassName: the cluster default is used (Kind: "standard",
+  # AKS/EKS/GKE: their default disk class). Keeps one base for all environments.
 
   resources:
     requests:

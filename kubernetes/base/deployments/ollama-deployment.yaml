@@ -8,6 +8,12 @@ metadata:
 spec:
   replicas: 1
 
+  revisionHistoryLimit: 2
+
+  # ReadWriteOnce volume + single replica: never run old and new pod together.
+  strategy:
+    type: Recreate
+
   selector:
     matchLabels:
       app: ollama
@@ -22,6 +28,8 @@ spec:
 
         - name: ollama
 
+          # TODO(pin): replace "latest" with the exact version in use, e.g.
+          #   kubectl exec deploy/ollama -n <ns> -- ollama --version
           image: ollama/ollama:latest
 
           imagePullPolicy: IfNotPresent
@@ -29,23 +37,39 @@ spec:
           ports:
             - containerPort: 11434
 
+          env:
+            # Experiment-validity settings (controlled variables):
+            - name: OLLAMA_KEEP_ALIVE   # never unload the model between requests
+              value: "-1"
+            - name: OLLAMA_NUM_PARALLEL  # one request at a time per replica
+              value: "1"
+            - name: OLLAMA_MAX_LOADED_MODELS
+              value: "1"
+
           volumeMounts:
             - name: ollama-storage
               mountPath: /root/.ollama
+
+          startupProbe:
+            httpGet:
+              path: /api/tags
+              port: 11434
+            periodSeconds: 5
+            failureThreshold: 60
 
           readinessProbe:
             httpGet:
               path: /api/tags
               port: 11434
-            initialDelaySeconds: 10
             periodSeconds: 10
 
           livenessProbe:
             httpGet:
               path: /api/tags
               port: 11434
-            initialDelaySeconds: 30
             periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 6
 
           resources:
             requests:

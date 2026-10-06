@@ -15,7 +15,7 @@ metadata:
 spec:
   replicas: 1
 
-  revisionHistoryLimit: 10
+  revisionHistoryLimit: 2
 
   strategy:
     type: RollingUpdate
@@ -52,7 +52,7 @@ spec:
 
         - name: fastapi
 
-          image: llm-api:latest
+          image: llm-api:1.0.0
 
           imagePullPolicy: IfNotPresent
 
