@@ -49,8 +49,14 @@ k6 run --quiet -e BASE_URL="$BASE_URL" -e VUS="$VUS" -e DURATION="$WARMUP" "$SCR
 SAMPLER_PID=""
 if kubectl top pods -n "$NS" >/dev/null 2>&1; then
   (
+    NAMESPACES="$NS"
+    kubectl get ns traefik >/dev/null 2>&1 && NAMESPACES="$NS traefik"
     while true; do
-      echo "$(date -u +%H:%M:%S) $(kubectl top pods -n "$NS" --no-headers 2>/dev/null | tr -s ' ' | tr '\n' ';')"
+      LINE=""
+      for n in $NAMESPACES; do
+        LINE="$LINE$(kubectl top pods -n "$n" --no-headers 2>/dev/null | tr -s ' ' | tr '\n' ';')"
+      done
+      echo "$(date -u +%H:%M:%S) $LINE"
       sleep 15
     done
   ) > "$OUT/${CONFIG}-r${REP}.resources.txt" &
@@ -63,6 +69,7 @@ BEFORE="$(restarts)"
 echo "== measured run: $RUN_ID ($DURATION, $VUS VUs)"
 START="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 k6 run -e BASE_URL="$BASE_URL" -e VUS="$VUS" -e DURATION="$DURATION" -e RUN_ID="$RUN_ID" \
+  --summary-trend-stats="avg,min,med,max,p(90),p(95),p(99)" \
   --summary-export="$OUT/${CONFIG}-r${REP}.json" "$SCRIPT" || true
 END="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 [ -n "$SAMPLER_PID" ] && kill "$SAMPLER_PID" 2>/dev/null || true
