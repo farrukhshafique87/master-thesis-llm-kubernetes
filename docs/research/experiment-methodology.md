@@ -1,21 +1,25 @@
 # Experiment Methodology
 
-Status: **proposed** — confirm with the supervisor before the first measured run.
-This document defines how every experiment is run. It contains no results.
+Status: draft.
+This document defines how each experiment is run. Results are stored in `results/`.
 
 ## 1. Fixed decisions
 
-| Topic            | Decision                                                         |
-| ---------------- | ---------------------------------------------------------------- |
-| Research Qs      | RQ1 total overhead, RQ2 local vs cloud, RQ3 per-control          |
-| Deadline         | December 2026                                                    |
-| Model            | Qwen2.5 0.5b via Ollama (larger models too slow on the local host)  |
-| Inference params | temperature 0.0, seed 42, 64 output tokens, model kept loaded    |
-| Configuration    | Kustomize: one base, overlays per environment and security level |
-| Baseline         | `kind-baseline` overlay: no security controls                    |
-| Secure           | `kind-secure` overlay: controls added as Kustomize components    |
-| Run rule         | Only ONE environment (baseline or secure) runs at a time         |
-| CNI              | Calico in all runs (baseline and secure)                         |
+| Topic            | Decision                                                           |
+| ---------------- | ------------------------------------------------------------------ |
+| Research Qs      | RQ1 total overhead, RQ2 local vs cloud, RQ3 per-control            |
+| Deadline         | December 2026                                                      |
+| Model            | Qwen2.5 0.5b via Ollama (larger models too slow on the local host) |
+| Inference params | temperature 0.0, seed 42, 64 output tokens, model kept loaded      |
+| Configuration    | Kustomize: one base, overlays per environment and security level   |
+| Baseline         | `kind-baseline` overlay: no security controls                      |
+| Secure           | `kind-secure` overlay: controls added as Kustomize components      |
+| Ingress          | Traefik (ingress-nginx was retired upstream in March 2026)         |
+| Gateway          | Own FastAPI gateway pod: API key from a Secret, route allowlist    |
+| TLS              | Self-signed EC P-256 certificate, terminated at the ingress        |
+| Secure entry     | https://localhost:8443 (k6: K6_INSECURE_SKIP_TLS_VERIFY=true)      |
+| Run rule         | Only ONE environment (baseline or secure) runs at a time           |
+| CNI              | Calico in all runs (baseline and secure)                           |
 
 ## 2. What "baseline" contains
 
@@ -31,7 +35,7 @@ Ollama settings (keep-alive, parallelism), resource requests/limits, Kubernetes
 and Calico versions, load profile and tool versions. Any change is recorded in
 the environment record (`scripts/record-environment.sh`).
 
-## 4. Run protocol (proposed)
+## 4. Run protocol
 
 1. Pause the other environment (`make pause-baseline` / `make pause-secure`).
 2. Run `scripts/record-environment.sh results/<exp>/ <namespace>`.
@@ -57,7 +61,7 @@ Per configuration: median of repetitions with min–max spread. Overhead =
 Report the spread so that differences inside the noise are not claimed as
 overhead. Report Kind and cloud results separately (RQ2).
 
-## 7. Threats to validity (to discuss in the thesis)
+## 7. Threats to validity
 
 * Kind nodes are containers on one machine: no real network between nodes, and
   the load generator shares the host CPU.
@@ -65,3 +69,10 @@ overhead. Report Kind and cloud results separately (RQ2).
 * Overhead of NetworkPolicies is specific to the CNI (Calico).
 * Single model, single prompt, small repetition count.
 * Cloud node types differ from the laptop; compare relative overhead only.
+* k6 reuses connections, so the TLS handshake cost is spread over many requests;
+  handshake cost alone is not measured.
+* The lab certificate is self-signed and k6 skips certificate verification, so
+  certificate validation cost is not included.
+* TLS ends at the ingress; hops behind it are plain HTTP until mTLS (C3) is on.
+* The gateway is a Python (FastAPI/httpx) proxy; its overhead reflects this
+  implementation, not API gateways in general.

@@ -1,25 +1,28 @@
 .PHONY: help format lint validate validate-kube validate-yaml test clean \
-        kind-up kind-down build load deploy-baseline deploy-secure \
+        kind-up kind-down build load build-gateway load-gateway ingress secrets \
+        deploy-baseline deploy-secure \
         pull-model-baseline pull-model-secure pause-baseline pause-secure \
         resume-baseline resume-secure
 
 IMAGE ?= llm-api:1.0.0
+GATEWAY_IMAGE ?= llm-gateway:1.0.0
 CLUSTER ?= thesis-cluster
 
 help:
 	@echo "Code quality:   format lint test validate"
 	@echo "Cluster:        kind-up kind-down"
-	@echo "Image:          build load"
+	@echo "Image:          build load build-gateway load-gateway"
+	@echo "Secure setup:   secrets ingress (once), then deploy-secure"
 	@echo "Deploy:         deploy-baseline deploy-secure"
 	@echo "Model:          pull-model-baseline pull-model-secure"
 	@echo "Run one env at a time: pause-<env> / resume-<env>"
 
 format:
-	black apps/llm-api
-	isort apps/llm-api
+	black apps
+	isort apps
 
 lint:
-	ruff check apps/llm-api
+	ruff check apps
 
 validate-yaml:
 	yamllint .
@@ -35,6 +38,7 @@ validate:
 
 test:
 	cd apps/llm-api && pytest
+	cd apps/llm-gateway && pytest
 
 kind-up:
 	./scripts/kind-up.sh
@@ -47,6 +51,18 @@ build:
 
 load:
 	kind load docker-image $(IMAGE) --name $(CLUSTER)
+
+build-gateway:
+	docker build -t $(GATEWAY_IMAGE) apps/llm-gateway
+
+load-gateway:
+	kind load docker-image $(GATEWAY_IMAGE) --name $(CLUSTER)
+
+ingress:
+	./scripts/install-ingress.sh
+
+secrets:
+	./scripts/gen-secrets.sh
 
 deploy-baseline:
 	kubectl apply -k kubernetes/overlays/kind-baseline

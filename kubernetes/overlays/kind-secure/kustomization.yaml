@@ -11,8 +11,22 @@ resources:
 
 components:
   - ../../components/kind-placement
-  # Milestone 6: add one line per control, e.g.
+  - ../../components/gateway
+  - ../../components/ingress-tls
+  # Milestone 6 adds more controls here, one line each:
   # - ../../components/rbac
   # - ../../components/network-policies
-  # - ../../components/secrets
-  # - ../../components/ingress-gateway
+  # - ../../components/mtls
+
+# Entry point of the secure setup: Traefik (HTTPS) -> gateway -> FastAPI.
+patches:
+  - target:
+      kind: Ingress
+      name: llm-ingress
+    patch: |-
+      - op: replace
+        path: /spec/rules/0/http/paths/0/backend/service/name
+        value: gateway-service
+      - op: replace
+        path: /spec/rules/0/http/paths/0/backend/service/port/number
+        value: 8080

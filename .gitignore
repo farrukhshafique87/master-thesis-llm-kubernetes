@@ -64,3 +64,6 @@ kubeconfig*
 monitoring/grafana/secret.yaml
 !monitoring/grafana/secret.example.yaml
 !docker/.env.example
+*.crt
+kubernetes/components/gateway/gateway.env
+!kubernetes/components/gateway/gateway.env.example

@@ -16,3 +16,7 @@ indent_style = tab
 
 [*.md]
 trim_trailing_whitespace = false
+
+[results/**]
+trim_trailing_whitespace = false
+insert_final_newline = false

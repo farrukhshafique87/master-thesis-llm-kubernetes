@@ -19,7 +19,7 @@ export const options = {
     },
   },
   thresholds: {
-    // Acceptance thresholds (NOT results): see research integrity rule 7.
+    // Pass/fail limits for the run; they are not results.
     http_req_failed: ['rate<0.05'],
     http_req_duration: ['p(95)<30000'],
   },

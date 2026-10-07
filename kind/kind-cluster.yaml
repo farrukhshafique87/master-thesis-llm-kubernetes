@@ -1,4 +1,4 @@
-# Kind cluster for the thesis: 1 control-plane + 2 workers.
+# Kind cluster: 1 control-plane + 2 workers.
 # Default CNI is disabled on purpose: Calico is installed instead (kindnet does
 # NOT enforce NetworkPolicies). The SAME CNI is used for baseline and secure
 # runs so the CNI is not a confounding variable.

@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# Install the Traefik ingress controller on Kind. Re-runnable.
+# Optional: TRAEFIK_CHART_VERSION=<x.y.z> to pin the Helm chart version.
+set -euo pipefail
+
+cd "$(dirname "$0")/.."
+
+helm repo add traefik https://traefik.github.io/charts >/dev/null 2>&1 || true
+helm repo update >/dev/null
+
+VERSION_ARGS=()
+if [ -n "${TRAEFIK_CHART_VERSION:-}" ]; then
+  VERSION_ARGS=(--version "$TRAEFIK_CHART_VERSION")
+fi
+
+helm upgrade --install traefik traefik/traefik \
+  --namespace traefik --create-namespace \
+  "${VERSION_ARGS[@]}" \
+  -f kind/traefik-values.yaml
+
+kubectl -n traefik rollout status deploy/traefik --timeout=180s
+
+echo "== versions in use =="
+helm list -n traefik
+kubectl -n traefik get deploy traefik -o jsonpath='{.spec.template.spec.containers[0].image}{"\n"}'
+kubectl get ingressclass
+kubectl -n traefik get pods -o wide

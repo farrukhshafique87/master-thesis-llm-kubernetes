@@ -21,3 +21,11 @@ patches:
         path: /spec/template/spec/nodeSelector
         value:
           role: api
+  - target:
+      kind: Deployment
+      name: gateway
+    patch: |-
+      - op: add
+        path: /spec/template/spec/nodeSelector
+        value:
+          role: api

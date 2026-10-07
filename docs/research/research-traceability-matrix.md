@@ -16,7 +16,7 @@ The thesis focuses on the secure distributed deployment and performance evaluati
 
 **What total performance overhead (latency, throughput, resource consumption) is introduced when standard cloud-native security controls are layered onto a distributed LLM serving stack on Kubernetes?**
 
-The unsecured baseline is compared with the fully secured configuration (RBAC, NetworkPolicies, mTLS, Secrets Management, NGINX Ingress with an authenticated FastAPI gateway) under identical workloads.
+The unsecured baseline is compared with the fully secured configuration (RBAC, NetworkPolicies, mTLS, Secrets Management, a TLS ingress controller and an authenticated API gateway) under identical workloads.
 
 ### RQ2 — Effect of the Deployment Environment
 
@@ -64,18 +64,18 @@ Workload intensity (EXP-02), replica count (EXP-03) and resource limits (EXP-04)
 
 ### 3.2 RQ to experiment map
 
-| RQ  | Exp    | Role            | Variable              | Metrics     | Status      |
-| --- | ------ | --------------- | --------------------- | ----------- | ----------- |
-| RQ1 | EXP-00 | Prerequisite    | Deployment health     | A           | Partial     |
-| RQ1 | EXP-01 | Reference       | 1 VU, unsecured       | L T E C M S | Completed   |
-| RQ1 | EXP-02 | Operating point | VUs / request rate    | L T E C M   | Planned     |
-| RQ1 | EXP-03 | Sensitivity     | Replica count         | L T E C M   | Planned     |
-| RQ1 | EXP-04 | Sensitivity     | CPU / memory limits   | L T E C M   | Planned     |
-| RQ1 | EXP-05 | Verification    | Controls work         | A B         | Planned     |
-| RQ1 | EXP-06 | Primary         | Baseline vs secure    | L T E C M S | Planned     |
-| RQ2 | EXP-07 | Primary         | Kind vs managed cloud | L T E C M S | Planned     |
-| RQ3 | EXP-05 | Verification    | Per-control checks    | A B         | Planned     |
-| RQ3 | EXP-06 | Primary         | One control at a time | L T E C M S | Planned     |
+| RQ  | Exp    | Role            | Variable              | Metrics     | Status    |
+| --- | ------ | --------------- | --------------------- | ----------- | --------- |
+| RQ1 | EXP-00 | Prerequisite    | Deployment health     | A           | Partial   |
+| RQ1 | EXP-01 | Reference       | 1 VU, unsecured       | L T E C M S | Completed |
+| RQ1 | EXP-02 | Operating point | VUs / request rate    | L T E C M   | Planned   |
+| RQ1 | EXP-03 | Sensitivity     | Replica count         | L T E C M   | Planned   |
+| RQ1 | EXP-04 | Sensitivity     | CPU / memory limits   | L T E C M   | Planned   |
+| RQ1 | EXP-05 | Verification    | Controls work         | A B         | Planned   |
+| RQ1 | EXP-06 | Primary         | Baseline vs secure    | L T E C M S | Planned   |
+| RQ2 | EXP-07 | Primary         | Kind vs managed cloud | L T E C M S | Planned   |
+| RQ3 | EXP-05 | Verification    | Per-control checks    | A B         | Planned   |
+| RQ3 | EXP-06 | Primary         | One control at a time | L T E C M S | Planned   |
 
 EXP-00 is *Partial* until CPU and memory collection (Metrics Server or cAdvisor) is verified, because Prometheus currently scrapes the FastAPI service only.
 
@@ -313,15 +313,19 @@ The experiment will determine whether security mechanisms introduce measurable o
 
 The same workload is run for each configuration, one control at a time, against the baseline:
 
-| Configuration | Controls enabled                                |
-| ------------- | ----------------------------------------------- |
-| C0            | None (baseline)                                 |
-| C1            | RBAC                                            |
-| C2            | NetworkPolicies (Calico)                        |
-| C3            | mTLS (Linkerd)                                  |
-| C4            | Secrets Management                              |
-| C5            | NGINX Ingress + FastAPI authentication gateway  |
-| C6            | All controls (total overhead for RQ1)           |
+| Configuration | Controls enabled                          |
+| ------------- | ----------------------------------------- |
+| C0            | None (baseline)                           |
+| C1            | RBAC                                      |
+| C2            | NetworkPolicies (Calico)                  |
+| C3            | mTLS (service mesh, tool to be confirmed) |
+| C4            | TLS ingress (Traefik)                     |
+| C5            | Authentication gateway (API key)          |
+| C6            | All controls (total overhead for RQ1)     |
+
+Secrets Management stores the TLS private key (C4) and the gateway API key (C5). It is expected to add no per-request cost, so it is verified functionally in EXP-05 and is not ranked as a separate configuration in RQ3.
+
+The upstream NGINX Ingress controller was retired in March 2026 (no further fixes, including security fixes), so Traefik is used as the maintained ingress controller.
 
 Each configuration is measured on two paths: the full `/chat` inference path and a lightweight `/health` path. Inference takes seconds, so small per-request overhead can disappear in the inference variance; the `/health` path exposes it.
 
@@ -423,7 +427,7 @@ Changes to hardware, model version, workload, resource allocation, or deployment
 | Experiment                     | Status               | Next Requirement              |
 | ------------------------------ | -------------------- | ----------------------------- |
 | EXP-00 Deployment & Monitoring | Completed / baseline | Final verification            |
-| EXP-01 Baseline Load           | In progress          | Execute and record results    |
+| EXP-01 Baseline Load           | Completed            | Execute and record results    |
 | EXP-02 Load & Stress           | Planned              | Design and execute            |
 | EXP-03 Horizontal Scaling      | Planned              | Configure and execute         |
 | EXP-04 Resource Allocation     | Planned              | Define resource profiles      |

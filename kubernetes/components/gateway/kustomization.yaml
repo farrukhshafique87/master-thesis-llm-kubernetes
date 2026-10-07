@@ -1,0 +1,16 @@
+# Control: authenticated API gateway (API key from a Kubernetes Secret).
+# The key lives in gateway.env (git-ignored, created by scripts/gen-secrets.sh).
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+
+resources:
+  - deployment.yaml
+  - service.yaml
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+secretGenerator:
+  - name: gateway-api-key
+    envs:
+      - gateway.env

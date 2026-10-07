@@ -1,0 +1,30 @@
+# Traefik ingress controller for Kind (replaces ingress-nginx, which was retired
+# upstream in March 2026). Listens on the Kind control-plane node via hostPort:
+#   node :80 -> localhost:8080, node :443 -> localhost:8443 (see kind-cluster.yaml)
+deployment:
+  replicas: 1
+
+service:
+  type: ClusterIP
+
+ports:
+  web:
+    hostPort: 80
+  websecure:
+    hostPort: 443
+
+nodeSelector:
+  ingress-ready: "true"
+
+tolerations:
+  - key: node-role.kubernetes.io/control-plane
+    operator: Equal
+    effect: NoSchedule
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "128Mi"
+  limits:
+    cpu: "1"
+    memory: "256Mi"

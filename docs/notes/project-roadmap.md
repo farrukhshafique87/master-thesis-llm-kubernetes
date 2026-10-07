@@ -17,7 +17,7 @@
 - Ollama
 
 ## Milestone 4
-- NGINX Ingress
+- Ingress controller (Traefik; ingress-nginx retired March 2026)
 - TLS
 
 ## Milestone 5

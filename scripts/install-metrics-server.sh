@@ -12,6 +12,6 @@ if ! kubectl -n kube-system get deploy metrics-server -o jsonpath='{.spec.templa
 fi
 
 kubectl -n kube-system rollout status deploy/metrics-server --timeout=180s
-echo "Image in use (record this version in the thesis):"
+echo "Image in use:"
 kubectl -n kube-system get deploy metrics-server -o jsonpath='{.spec.template.spec.containers[0].image}{"\n"}'
 echo "Try: kubectl top nodes   (may need ~60 s before data appears)"

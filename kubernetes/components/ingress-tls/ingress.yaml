@@ -1,0 +1,30 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+
+metadata:
+  name: llm-ingress
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+
+spec:
+  ingressClassName: traefik
+
+  tls:
+    - hosts:
+        - localhost
+      secretName: ingress-tls
+
+  rules:
+    - host: localhost
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                # Default: straight to the API. Overlays that enable the
+                # gateway patch this to gateway-service:8080.
+                name: fastapi-service
+                port:
+                  number: 8010
