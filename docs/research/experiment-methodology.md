@@ -17,6 +17,7 @@ This document defines how each experiment is run. Results are stored in `results
 | Ingress          | Traefik (ingress-nginx was retired upstream in March 2026)         |
 | Gateway          | Own FastAPI gateway pod: API key from a Secret, route allowlist    |
 | TLS              | Self-signed EC P-256 certificate, terminated at the ingress        |
+| mTLS             | Linkerd edge channel; Istio optional on the cloud                  |
 | Secure entry     | https://localhost:8443 (k6: K6_INSECURE_SKIP_TLS_VERIFY=true)      |
 | Run rule         | Only ONE environment (baseline or secure) runs at a time           |
 | CNI              | Calico in all runs (baseline and secure)                           |
@@ -76,19 +77,25 @@ overhead. Report Kind and cloud results separately (RQ2).
 * TLS ends at the ingress; hops behind it are plain HTTP until mTLS (C3) is on.
 * The gateway is a Python (FastAPI/httpx) proxy; its overhead reflects this
   implementation, not API gateways in general.
+* Linkerd's open-source project publishes edge releases only; the chart and
+  proxy versions are recorded in the environment record of each run.
 
 ## 8. Configurations and entry points
 
-| Config       | Overlay           | Namespace        | Entry                      | Key |
-| ------------ | ----------------- | ---------------- | -------------------------- | --- |
-| c0-baseline  | kind-baseline     | llm-baseline     | http://localhost:8010      | no  |
-| c1-rbac      | kind-c1-rbac      | llm-c1-rbac      | http://localhost:8010      | no  |
-| c2-netpol    | kind-c2-netpol    | llm-c2-netpol    | http://localhost:8010      | no  |
-| c4-tls       | kind-c4-tls       | llm-c4-tls       | https://localhost:8443     | no  |
-| c5-gateway   | kind-c5-gateway   | llm-c5-gateway   | http://localhost:8010      | yes |
-| c6-all       | kind-secure       | llm-secure       | https://localhost:8443     | yes |
+| Config      | Overlay         | Namespace      | Entry                  | Key |
+| ----------- | --------------- | -------------- | ---------------------- | --- |
+| c0-baseline | kind-baseline   | llm-baseline   | http://localhost:8010  | no  |
+| c1-rbac     | kind-c1-rbac    | llm-c1-rbac    | http://localhost:8010  | no  |
+| c2-netpol   | kind-c2-netpol  | llm-c2-netpol  | http://localhost:8010  | no  |
+| c3-mtls     | kind-c3-mtls    | llm-c3-mtls    | http://localhost:8010  | no  |
+| c4-tls      | kind-c4-tls     | llm-c4-tls     | https://localhost:8443 | no  |
+| c5-gateway  | kind-c5-gateway | llm-c5-gateway | http://localhost:8010  | yes |
+| c6-all      | kind-secure     | llm-secure     | https://localhost:8443 | yes |
 
-C3 (mTLS) is added once the service mesh is chosen. Configurations without an
+C3 uses Linkerd. Only hops between meshed workloads use mTLS; Traefik is not
+meshed, so the hop from the ingress to the gateway is plain HTTP.
+
+Configurations without an
 ingress are reached through a NodePort on the Kind control-plane node;
 configurations with TLS go through Traefik. The entry path is therefore part of
 what each configuration changes.

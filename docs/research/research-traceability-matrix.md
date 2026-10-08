@@ -313,15 +313,15 @@ The experiment will determine whether security mechanisms introduce measurable o
 
 The same workload is run for each configuration, one control at a time, against the baseline:
 
-| Configuration | Controls enabled                          |
-| ------------- | ----------------------------------------- |
-| C0            | None (baseline)                           |
-| C1            | RBAC                                      |
-| C2            | NetworkPolicies (Calico)                  |
-| C3            | mTLS (service mesh, tool to be confirmed) |
-| C4            | TLS ingress (Traefik)                     |
-| C5            | Authentication gateway (API key)          |
-| C6            | All controls (total overhead for RQ1)     |
+| Configuration | Controls enabled                      |
+| ------------- | ------------------------------------- |
+| C0            | None (baseline)                       |
+| C1            | RBAC                                  |
+| C2            | NetworkPolicies (Calico)              |
+| C3            | mTLS (Linkerd, edge channel)          |
+| C4            | TLS ingress (Traefik)                 |
+| C5            | Authentication gateway (API key)      |
+| C6            | All controls (total overhead for RQ1) |
 
 Secrets Management stores the TLS private key (C4) and the gateway API key (C5). It is expected to add no per-request cost, so it is verified functionally in EXP-05 and is not ranked as a separate configuration in RQ3.
 

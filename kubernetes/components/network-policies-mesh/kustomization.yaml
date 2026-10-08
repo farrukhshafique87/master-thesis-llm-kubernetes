@@ -1,0 +1,13 @@
+# Extra NetworkPolicy rules needed when the pods are meshed with Linkerd:
+# the proxies must reach the Linkerd control plane, and meshed pods talk to
+# each other on the proxy port 4143 instead of the application port. The 4143
+# rules follow the same pairs as the application rules (gateway -> api -> ollama),
+# so the mesh does not open any extra path between pods.
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+
+resources:
+  - mesh-control-plane-egress.yaml
+  - mesh-api-to-ollama.yaml
+  - mesh-api-proxy-traffic.yaml
+  - mesh-gateway-egress.yaml

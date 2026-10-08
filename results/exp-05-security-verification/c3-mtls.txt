@@ -1,0 +1,6 @@
+== mTLS (Linkerd)
+PASS  api pod runs the Linkerd proxy
+PASS  ollama pod runs the Linkerd proxy
+PASS  api -> ollama traffic is mTLS (proxy metrics)
+
+passed: 3  failed: 0

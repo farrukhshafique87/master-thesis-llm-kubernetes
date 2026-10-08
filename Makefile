@@ -1,5 +1,5 @@
 .PHONY: help format lint validate validate-kube validate-yaml test clean \
-        kind-up kind-down build load build-gateway load-gateway ingress secrets \
+        kind-up kind-down build load build-gateway load-gateway ingress secrets linkerd \
         deploy-baseline deploy-secure \
         pull-model-baseline pull-model-secure pause-baseline pause-secure \
         resume-baseline resume-secure deploy verify measure
@@ -63,6 +63,9 @@ ingress:
 
 secrets:
 	./scripts/gen-secrets.sh
+
+linkerd:
+	./scripts/install-linkerd.sh
 
 deploy-baseline:
 	kubectl apply -k kubernetes/overlays/kind-baseline

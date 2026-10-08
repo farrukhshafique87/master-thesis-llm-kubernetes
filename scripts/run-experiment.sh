@@ -50,7 +50,9 @@ SAMPLER_PID=""
 if kubectl top pods -n "$NS" >/dev/null 2>&1; then
   (
     NAMESPACES="$NS"
-    kubectl get ns traefik >/dev/null 2>&1 && NAMESPACES="$NS traefik"
+    for extra in traefik linkerd; do
+      kubectl get ns "$extra" >/dev/null 2>&1 && NAMESPACES="$NAMESPACES $extra"
+    done
     while true; do
       LINE=""
       for n in $NAMESPACES; do

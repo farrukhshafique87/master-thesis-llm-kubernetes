@@ -1,0 +1,3 @@
+BLOCKED   http://fastapi-service.llm-c2-netpol:8010/health
+BLOCKED   http://ollama-service.llm-c2-netpol:11434/api/tags
+pod "nptest" deleted from default namespace

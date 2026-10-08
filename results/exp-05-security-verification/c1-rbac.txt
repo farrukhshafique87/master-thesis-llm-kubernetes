@@ -1,0 +1,8 @@
+== RBAC
+PASS  fastapi pod has no API token mounted
+PASS  fastapi service account cannot list pods
+PASS  viewer group can read pods
+PASS  viewer group cannot read secrets
+PASS  viewer group cannot delete deployments
+
+passed: 5  failed: 0

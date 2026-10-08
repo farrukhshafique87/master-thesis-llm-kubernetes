@@ -15,8 +15,8 @@ components:
   - ../../components/rbac
   - ../../components/network-policies
   - ../../components/network-policies-gateway-path
-  # mTLS is added here once the mesh is chosen:
-  # - ../../components/mtls
+  - ../../components/network-policies-mesh
+  - ../../components/mtls
 
 patches:
   - target:

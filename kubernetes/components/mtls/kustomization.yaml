@@ -1,0 +1,43 @@
+# Control: mTLS between pods with Linkerd. Adds the Linkerd proxy to every
+# workload and fixes the proxy resources so they are the same in every run.
+# Requires Linkerd to be installed first (scripts/install-linkerd.sh).
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+
+patches:
+  - target:
+      kind: Deployment
+      name: fastapi
+    patch: |-
+      - op: add
+        path: /spec/template/metadata/annotations
+        value:
+          linkerd.io/inject: enabled
+          config.linkerd.io/proxy-cpu-request: 50m
+          config.linkerd.io/proxy-cpu-limit: 500m
+          config.linkerd.io/proxy-memory-request: 64Mi
+          config.linkerd.io/proxy-memory-limit: 128Mi
+  - target:
+      kind: Deployment
+      name: ollama
+    patch: |-
+      - op: add
+        path: /spec/template/metadata/annotations
+        value:
+          linkerd.io/inject: enabled
+          config.linkerd.io/proxy-cpu-request: 50m
+          config.linkerd.io/proxy-cpu-limit: 500m
+          config.linkerd.io/proxy-memory-request: 64Mi
+          config.linkerd.io/proxy-memory-limit: 128Mi
+  - target:
+      kind: Deployment
+      name: gateway
+    patch: |-
+      - op: add
+        path: /spec/template/metadata/annotations
+        value:
+          linkerd.io/inject: enabled
+          config.linkerd.io/proxy-cpu-request: 50m
+          config.linkerd.io/proxy-cpu-limit: 500m
+          config.linkerd.io/proxy-memory-request: 64Mi
+          config.linkerd.io/proxy-memory-limit: 128Mi

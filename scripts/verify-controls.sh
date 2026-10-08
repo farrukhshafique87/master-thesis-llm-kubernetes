@@ -24,7 +24,7 @@ check() {
 
 # HTTP GET from inside a pod: fetch <deployment> <url>
 fetch() {
-  kubectl -n "$NS" exec "deploy/$1" -- python -c \
+  kubectl -n "$NS" exec "deploy/$1" -c "$1" -- python -c \
     "import sys, urllib.request; urllib.request.urlopen(sys.argv[1], timeout=4)" "$2"
 }
 
@@ -53,6 +53,31 @@ if kubectl -n "$NS" get networkpolicy -o name 2>/dev/null | grep -q .; then
     check "gateway -> api is allowed" yes fetch gateway http://fastapi-service:8010/health
     check "gateway -> ollama is blocked" no fetch gateway http://ollama-service:11434/api/tags
   fi
+fi
+
+has_proxy() {
+  local names
+  names=$(kubectl -n "$NS" get pods -l "$1" \
+    -o jsonpath='{.items[0].spec.containers[*].name} {.items[0].spec.initContainers[*].name}')
+  [[ "$names" == *linkerd-proxy* ]]
+}
+
+tls_seen() {
+  local metrics
+  metrics=$(kubectl -n "$NS" exec deploy/fastapi -c fastapi -- curl -s localhost:4191/metrics)
+  [[ "$metrics" == *'tls="true"'* ]]
+}
+
+mesh_enabled() {
+  [ "$(kubectl -n "$NS" get deploy fastapi -o jsonpath='{.spec.template.metadata.annotations.linkerd\.io/inject}')" = "enabled" ]
+}
+
+if mesh_enabled; then
+  echo "== mTLS (Linkerd)"
+  check "api pod runs the Linkerd proxy" yes has_proxy app.kubernetes.io/name=llm-api
+  check "ollama pod runs the Linkerd proxy" yes has_proxy app=ollama
+  fetch fastapi http://ollama-service:11434/api/tags >/dev/null 2>&1
+  check "api -> ollama traffic is mTLS (proxy metrics)" yes tls_seen
 fi
 
 echo

@@ -26,8 +26,8 @@ F="$OUT/environment.txt"
   kubectl -n "$NS" get deploy,svc,pvc,pods -o wide
   kubectl -n "$NS" get deploy -o jsonpath='{range .items[*]}{.metadata.name}{" image="}{.spec.template.spec.containers[*].image}{" resources="}{.spec.template.spec.containers[*].resources}{"\n"}{end}'
   echo "## Model"
-  kubectl -n "$NS" exec deploy/ollama -- ollama list 2>&1 || true
-  kubectl -n "$NS" exec deploy/ollama -- ollama --version 2>&1 || true
+  kubectl -n "$NS" exec deploy/ollama -c ollama -- ollama list 2>&1 || true
+  kubectl -n "$NS" exec deploy/ollama -c ollama -- ollama --version 2>&1 || true
   echo "## Controlled inference parameters"
   kubectl -n "$NS" get configmap fastapi-config -o jsonpath='{.data}'; echo
   echo "## Network policies / CNI"
@@ -37,6 +37,8 @@ F="$OUT/environment.txt"
   helm list -n traefik 2>&1 || true
   kubectl -n traefik get deploy -o jsonpath='{range .items[*]}{.metadata.name}{" image="}{.spec.template.spec.containers[*].image}{"\n"}{end}' 2>&1 || true
   kubectl -n "$NS" get deploy gateway -o jsonpath='gateway image={.spec.template.spec.containers[0].image}{"\n"}' 2>&1 || true
+  helm list -n linkerd 2>&1 || true
+  kubectl -n linkerd get deploy -o jsonpath='{range .items[*]}{.metadata.name}{" image="}{.spec.template.spec.containers[0].image}{"\n"}{end}' 2>&1 || true
   kubectl -n kube-system get deploy metrics-server -o jsonpath='metrics-server image={.spec.template.spec.containers[0].image}{"\n"}' 2>&1 || true
   kubectl -n "$NS" get ingress 2>&1 || true
   echo "## Git"

@@ -14,10 +14,10 @@ if [ -n "$OVERLAY" ]; then
   kubectl -n "$NS" delete networkpolicy --all --ignore-not-found
 fi
 
-kubectl -n "$NS" exec deploy/ollama -- ollama pull "$MODEL"
+kubectl -n "$NS" exec deploy/ollama -c ollama -- ollama pull "$MODEL"
 # Load the model (keep-alive is -1, so it stays in memory).
-kubectl -n "$NS" exec deploy/ollama -- ollama run "$MODEL" "Say OK." >/dev/null
-kubectl -n "$NS" exec deploy/ollama -- ollama list
+kubectl -n "$NS" exec deploy/ollama -c ollama -- ollama run "$MODEL" "Say OK." >/dev/null
+kubectl -n "$NS" exec deploy/ollama -c ollama -- ollama list
 
 if [ -n "$OVERLAY" ]; then
   kubectl apply -k "$OVERLAY"

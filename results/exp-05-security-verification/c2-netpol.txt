@@ -1,0 +1,5 @@
+== NetworkPolicies
+FAIL  api -> ollama is allowed (expected yes, got no)
+PASS  api -> internet is blocked
+
+passed: 1  failed: 1

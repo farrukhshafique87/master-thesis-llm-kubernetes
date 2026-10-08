@@ -57,7 +57,7 @@ def parse_resources(path: Path) -> dict[str, dict[str, list[float]]]:
             name, cpu, mem = parts
             if not (cpu.endswith("m") and mem.endswith("Mi")):
                 continue
-            prefix = name.split("-")[0]
+            prefix = name.rsplit("-", 2)[0]
             pods[prefix]["cpu"].append(float(cpu[:-1]))
             pods[prefix]["mem"].append(float(mem[:-2]))
     return pods

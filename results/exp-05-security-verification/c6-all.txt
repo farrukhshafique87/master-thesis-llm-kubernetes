@@ -1,0 +1,13 @@
+== RBAC
+PASS  fastapi pod has no API token mounted
+PASS  fastapi service account cannot list pods
+PASS  viewer group can read pods
+PASS  viewer group cannot read secrets
+PASS  viewer group cannot delete deployments
+== NetworkPolicies
+PASS  api -> ollama is allowed
+PASS  api -> internet is blocked
+PASS  gateway -> api is allowed
+PASS  gateway -> ollama is blocked
+
+passed: 9  failed: 0
