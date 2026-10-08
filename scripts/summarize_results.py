@@ -13,33 +13,34 @@ import re
 import statistics
 import sys
 from collections import defaultdict
+from collections.abc import Sequence
 from pathlib import Path
 
 RUN_FILE = re.compile(r"^(?P<config>.+)-r(?P<rep>\d+)\.json$")
 
 
-def metric(data: dict, name: str, stat: str):
+def metric(data: dict, name: str, stat: str) -> float | None:
     """Read one statistic; works for flat and nested ("values") k6 exports."""
     entry = data.get("metrics", {}).get(name, {})
     entry = entry.get("values", entry)
     return entry.get(stat)
 
 
-def failed_rate(data: dict):
+def failed_rate(data: dict) -> float | None:
     rate = metric(data, "http_req_failed", "rate")
     if rate is None:
         rate = metric(data, "http_req_failed", "value")
     return rate
 
 
-def fmt(values: list[float], digits: int = 1) -> str:
-    values = [v for v in values if v is not None]
-    if not values:
+def fmt(values: Sequence[float | None], digits: int = 1) -> str:
+    present = [v for v in values if v is not None]
+    if not present:
         return "-"
-    mean = statistics.mean(values)
-    if len(values) == 1 or min(values) == max(values):
+    mean = statistics.mean(present)
+    if len(present) == 1 or min(present) == max(present):
         return f"{mean:.{digits}f}"
-    return f"{mean:.{digits}f} ({min(values):.{digits}f}-{max(values):.{digits}f})"
+    return f"{mean:.{digits}f} ({min(present):.{digits}f}-{max(present):.{digits}f})"
 
 
 def parse_resources(path: Path) -> dict[str, dict[str, list[float]]]:
@@ -82,8 +83,8 @@ def summarise(directory: Path) -> None:
     resource_rows = []
     for config, files in runs.items():
         data = [json.loads(f.read_text()) for f in files]
-        failed = [failed_rate(d) for d in data]
-        failed = [None if v is None else v * 100 for v in failed]
+        rates = [failed_rate(d) for d in data]
+        failed = [None if v is None else v * 100 for v in rates]
         print(
             f"| {config} | {len(files)} "
             f"| {fmt([metric(d, 'http_req_duration', 'avg') for d in data], 2)} "

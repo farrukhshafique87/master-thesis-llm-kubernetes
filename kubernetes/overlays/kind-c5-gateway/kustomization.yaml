@@ -1,0 +1,24 @@
+# C5: authentication gateway only. Entry: http://localhost:8010 (NodePort on the gateway).
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: llm-c5-gateway
+
+resources:
+  - ../../base
+
+components:
+  - ../../components/kind-placement
+  - ../../components/gateway
+
+patches:
+  - target:
+      kind: Service
+      name: gateway-service
+    patch: |-
+      - op: replace
+        path: /spec/type
+        value: NodePort
+      - op: add
+        path: /spec/ports/0/nodePort
+        value: 30010

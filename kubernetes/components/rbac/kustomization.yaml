@@ -1,0 +1,43 @@
+# Control: RBAC. One service account per workload without an API token, plus a
+# read-only role for operators. The request path is not touched by RBAC.
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+
+resources:
+  - sa-fastapi.yaml
+  - sa-ollama.yaml
+  - sa-gateway.yaml
+  - role.yaml
+  - rolebinding.yaml
+
+patches:
+  - target:
+      kind: Deployment
+      name: fastapi
+    patch: |-
+      - op: add
+        path: /spec/template/spec/serviceAccountName
+        value: fastapi
+      - op: add
+        path: /spec/template/spec/automountServiceAccountToken
+        value: false
+  - target:
+      kind: Deployment
+      name: ollama
+    patch: |-
+      - op: add
+        path: /spec/template/spec/serviceAccountName
+        value: ollama
+      - op: add
+        path: /spec/template/spec/automountServiceAccountToken
+        value: false
+  - target:
+      kind: Deployment
+      name: gateway
+    patch: |-
+      - op: add
+        path: /spec/template/spec/serviceAccountName
+        value: gateway
+      - op: add
+        path: /spec/template/spec/automountServiceAccountToken
+        value: false

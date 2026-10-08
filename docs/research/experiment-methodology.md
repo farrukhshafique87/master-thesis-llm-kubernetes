@@ -76,3 +76,24 @@ overhead. Report Kind and cloud results separately (RQ2).
 * TLS ends at the ingress; hops behind it are plain HTTP until mTLS (C3) is on.
 * The gateway is a Python (FastAPI/httpx) proxy; its overhead reflects this
   implementation, not API gateways in general.
+
+## 8. Configurations and entry points
+
+| Config       | Overlay           | Namespace        | Entry                      | Key |
+| ------------ | ----------------- | ---------------- | -------------------------- | --- |
+| c0-baseline  | kind-baseline     | llm-baseline     | http://localhost:8010      | no  |
+| c1-rbac      | kind-c1-rbac      | llm-c1-rbac      | http://localhost:8010      | no  |
+| c2-netpol    | kind-c2-netpol    | llm-c2-netpol    | http://localhost:8010      | no  |
+| c4-tls       | kind-c4-tls       | llm-c4-tls       | https://localhost:8443     | no  |
+| c5-gateway   | kind-c5-gateway   | llm-c5-gateway   | http://localhost:8010      | yes |
+| c6-all       | kind-secure       | llm-secure       | https://localhost:8443     | yes |
+
+C3 (mTLS) is added once the service mesh is chosen. Configurations without an
+ingress are reached through a NodePort on the Kind control-plane node;
+configurations with TLS go through Traefik. The entry path is therefore part of
+what each configuration changes.
+
+Each configuration runs in its own namespace with its own model volume. Only one
+namespace is active at a time; `scripts/measure-config.sh` pauses the others,
+starts the requested one, and runs the `/chat` and `/health` tests. Repetitions
+are interleaved by looping over the configurations for each repetition.

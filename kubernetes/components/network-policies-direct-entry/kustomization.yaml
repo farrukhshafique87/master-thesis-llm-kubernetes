@@ -1,0 +1,6 @@
+# Entry rule for configurations where clients reach the API directly (NodePort).
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+
+resources:
+  - api-ingress-direct.yaml

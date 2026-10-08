@@ -1,6 +1,5 @@
-# Environment: Kind (local)   Security level: SECURE
-# Milestones 4/6 add the security controls here (one component per control so
-# each can be enabled alone for RQ3, or all together for RQ1).
+# C6: all implemented controls. Entry: https://localhost:8443 with an API key.
+# Path: Traefik (TLS) -> gateway -> FastAPI -> Ollama.
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
@@ -13,12 +12,12 @@ components:
   - ../../components/kind-placement
   - ../../components/gateway
   - ../../components/ingress-tls
-  # Milestone 6 adds more controls here, one line each:
-  # - ../../components/rbac
-  # - ../../components/network-policies
+  - ../../components/rbac
+  - ../../components/network-policies
+  - ../../components/network-policies-gateway-path
+  # mTLS is added here once the mesh is chosen:
   # - ../../components/mtls
 
-# Entry point of the secure setup: Traefik (HTTPS) -> gateway -> FastAPI.
 patches:
   - target:
       kind: Ingress

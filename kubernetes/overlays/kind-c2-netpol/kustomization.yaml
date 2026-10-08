@@ -1,0 +1,14 @@
+# C2: NetworkPolicies only. Entry: http://localhost:8010 (NodePort).
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: llm-c2-netpol
+
+resources:
+  - ../../base
+
+components:
+  - ../../components/kind-placement
+  - ../../components/kind-nodeport-entry
+  - ../../components/network-policies
+  - ../../components/network-policies-direct-entry

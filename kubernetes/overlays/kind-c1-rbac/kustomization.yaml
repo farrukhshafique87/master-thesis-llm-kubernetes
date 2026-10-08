@@ -1,0 +1,13 @@
+# C1: RBAC only. Entry: http://localhost:8010 (NodePort).
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: llm-c1-rbac
+
+resources:
+  - ../../base
+
+components:
+  - ../../components/kind-placement
+  - ../../components/kind-nodeport-entry
+  - ../../components/rbac

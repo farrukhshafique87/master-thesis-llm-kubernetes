@@ -1,0 +1,16 @@
+# Kind-only entry point for configurations without ingress:
+# localhost:8010 -> Kind node :30010 -> fastapi-service (same as kind-baseline).
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+
+patches:
+  - target:
+      kind: Service
+      name: fastapi-service
+    patch: |-
+      - op: replace
+        path: /spec/type
+        value: NodePort
+      - op: add
+        path: /spec/ports/0/nodePort
+        value: 30010

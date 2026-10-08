@@ -1,0 +1,11 @@
+# Control: NetworkPolicies (enforced by Calico). Default deny, then only the
+# flows the application needs. Entry-point rules live in the sibling components
+# network-policies-direct-entry and network-policies-gateway-path.
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+
+resources:
+  - default-deny.yaml
+  - allow-dns.yaml
+  - ollama-ingress.yaml
+  - fastapi-egress.yaml

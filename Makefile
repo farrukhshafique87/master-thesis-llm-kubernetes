@@ -2,7 +2,7 @@
         kind-up kind-down build load build-gateway load-gateway ingress secrets \
         deploy-baseline deploy-secure \
         pull-model-baseline pull-model-secure pause-baseline pause-secure \
-        resume-baseline resume-secure
+        resume-baseline resume-secure deploy verify measure
 
 IMAGE ?= llm-api:1.0.0
 GATEWAY_IMAGE ?= llm-gateway:1.0.0
@@ -74,7 +74,7 @@ pull-model-baseline:
 	./scripts/pull-model.sh llm-baseline
 
 pull-model-secure:
-	./scripts/pull-model.sh llm-secure
+	./scripts/pull-model.sh llm-secure kubernetes/overlays/kind-secure
 
 pause-baseline:
 	./scripts/pause-env.sh llm-baseline
@@ -83,10 +83,21 @@ pause-secure:
 	./scripts/pause-env.sh llm-secure
 
 resume-baseline:
-	./scripts/resume-env.sh llm-baseline
+	./scripts/resume-env.sh kubernetes/overlays/kind-baseline llm-baseline
 
 resume-secure:
-	./scripts/resume-env.sh llm-secure
+	./scripts/resume-env.sh kubernetes/overlays/kind-secure llm-secure
+
+# Generic helpers: make deploy ENV=kind-c1-rbac | make verify NS=llm-c1-rbac
+deploy:
+	kubectl apply -k kubernetes/overlays/$(ENV)
+
+verify:
+	./scripts/verify-controls.sh $(NS)
+
+# make measure CONFIG=c1-rbac REP=1
+measure:
+	./scripts/measure-config.sh $(CONFIG) $(REP)
 
 clean:
 	find . -type d -name "__pycache__" -prune -exec rm -rf {} +

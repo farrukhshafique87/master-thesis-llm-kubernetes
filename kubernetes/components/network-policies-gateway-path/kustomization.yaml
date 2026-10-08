@@ -1,0 +1,8 @@
+# Entry rules for the gateway path: ingress controller -> gateway -> API.
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+
+resources:
+  - gateway-ingress.yaml
+  - gateway-egress.yaml
+  - api-from-gateway.yaml
